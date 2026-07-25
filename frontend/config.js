@@ -1,0 +1,4 @@
+window.APP_CONFIG = {
+  apiEndpoint: "PASTE_TERRAFORM_API_ENDPOINT_HERE"
+};
+

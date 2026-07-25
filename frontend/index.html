@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Event-driven AWS image processing demo">
+  <title>Cloud Image Pipeline</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="copy">
+      <p class="eyebrow">AWS · EVENT DRIVEN · SERVERLESS</p>
+      <h1>Upload once.<br><span>Process automatically.</span></h1>
+      <p class="lede">Images travel directly to private object storage. An S3 event wakes a Lambda that creates an optimized WebP thumbnail—no server to manage.</p>
+      <ol class="flow" aria-label="Processing stages">
+        <li><b>01</b> Signed upload</li><li><b>02</b> S3 event</li><li><b>03</b> Lambda resize</li><li><b>04</b> Secure result</li>
+      </ol>
+    </section>
+    <section class="card">
+      <div id="dropZone" class="drop-zone">
+        <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+        <div class="upload-icon">↑</div>
+        <h2>Drop an image here</h2>
+        <p>JPEG, PNG or WebP · max 10 MB</p>
+        <button id="chooseButton" type="button">Choose image</button>
+      </div>
+      <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
+      <p id="status" class="status" role="status"></p>
+      <img id="result" class="result" alt="Processed thumbnail" hidden>
+    </section>
+  </main>
+  <script src="config.js"></script><script src="app.js"></script>
+</body>
+</html>
+

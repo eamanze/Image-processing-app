@@ -1,0 +1,44 @@
+name: Destroy infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type destroy-cloudwithliz.space
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloud-image-pipeline-production
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: production-destroy
+    steps:
+      - name: Verify typed confirmation
+        if: inputs.confirmation != 'destroy-cloudwithliz.space'
+        run: exit 1
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          allowed-account-ids: "431655581157"
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.14.0"
+      - run: ./scripts/package-lambdas.sh
+      - run: terraform -chdir=terraform init -input=false
+      - run: terraform -chdir=terraform plan -destroy -input=false -out=destroy.tfplan
+      - run: terraform -chdir=terraform apply -input=false -auto-approve destroy.tfplan
+

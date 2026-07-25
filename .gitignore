@@ -1,0 +1,13 @@
+.terraform/
+*.tfstate*
+*.tfplan
+bootstrap/backend.tf
+bootstrap/terraform.tfvars
+*.zip
+build/
+dist/
+__pycache__/
+.pytest_cache/
+.venv/
+.env
+.DS_Store

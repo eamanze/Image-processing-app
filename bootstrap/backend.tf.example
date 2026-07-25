@@ -1,0 +1,12 @@
+# Copy this file to backend.tf only after the first bootstrap apply. The state
+# bucket must exist before this backend can be initialized.
+terraform {
+  backend "s3" {
+    bucket       = "cloud-image-pipeline-terraform-state-431655581157"
+    key          = "bootstrap/terraform.tfstate"
+    region       = "us-east-1"
+    encrypt      = true
+    use_lockfile = true
+  }
+}
+
