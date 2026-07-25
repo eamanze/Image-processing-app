@@ -48,11 +48,19 @@ cp bootstrap/terraform.tfvars.example bootstrap/terraform.tfvars
 Edit `bootstrap/terraform.tfvars`:
 
 ```hcl
-github_owner      = "YOUR_GITHUB_USERNAME_OR_ORG"
-github_repository = "YOUR_REPOSITORY_NAME"
+github_owner         = "YOUR_GITHUB_USERNAME_OR_ORG"
+github_owner_id      = "YOUR_GITHUB_OWNER_ID"
+github_repository    = "YOUR_REPOSITORY_NAME"
+github_repository_id = "YOUR_GITHUB_REPOSITORY_ID"
 
 create_github_oidc_provider = true
 ```
+
+This repository uses customized GitHub OIDC subjects that bind both names to
+their immutable IDs. Read the `sub` claim from a diagnostic workflow run and
+copy the IDs following the owner and repository names. For example,
+`repo:OWNER@123/REPOSITORY@456:environment:production` uses owner ID `123` and
+repository ID `456`.
 
 Check whether the AWS account already has the GitHub provider:
 
@@ -248,12 +256,13 @@ The application resources and DNS records are removed. The existing Route 53 hos
 
 ### OIDC access denied
 
-Compare the IAM trust-policy `sub` with the job:
+Compare the IAM trust-policy `sub` with the job. This repository's customized
+OIDC subject prefix is `repo:OWNER@OWNER_ID/REPOSITORY@REPOSITORY_ID`:
 
-- PR plan: `repo:OWNER/REPOSITORY:pull_request`
-- Manual plan on main: `repo:OWNER/REPOSITORY:ref:refs/heads/main`
-- Apply/frontend: `repo:OWNER/REPOSITORY:environment:production`
-- Destroy: `repo:OWNER/REPOSITORY:environment:production-destroy`
+- PR plan: `repo:OWNER@OWNER_ID/REPOSITORY@REPOSITORY_ID:pull_request`
+- Manual plan on main: `repo:OWNER@OWNER_ID/REPOSITORY@REPOSITORY_ID:ref:refs/heads/main`
+- Apply/frontend: `repo:OWNER@OWNER_ID/REPOSITORY@REPOSITORY_ID:environment:production`
+- Destroy: `repo:OWNER@OWNER_ID/REPOSITORY@REPOSITORY_ID:environment:production-destroy`
 
 Also confirm the audience is `sts.amazonaws.com`.
 

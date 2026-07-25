@@ -1,6 +1,7 @@
-github_owner      = "YOUR_GITHUB_USERNAME_OR_ORG"
-github_repository = "Image-processing-app"
+github_owner         = "YOUR_GITHUB_USERNAME_OR_ORG"
+github_owner_id      = "YOUR_GITHUB_OWNER_ID"
+github_repository    = "Image-processing-app"
+github_repository_id = "YOUR_GITHUB_REPOSITORY_ID"
 
 # Set false if the AWS account already has the GitHub Actions OIDC provider.
 create_github_oidc_provider = true
-

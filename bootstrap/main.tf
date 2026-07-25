@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 locals {
-  repository_subject = "repo:${var.github_owner}/${var.github_repository}"
+  repository_subject = "repo:${var.github_owner}@${var.github_owner_id}/${var.github_repository}@${var.github_repository_id}"
   application_state  = "cloud-image-pipeline/production/terraform.tfstate"
   bootstrap_state    = "bootstrap/terraform.tfstate"
   state_objects = [
