@@ -12,7 +12,11 @@ locals {
   processed_bucket = "${local.name}-processed-${random_id.suffix.hex}"
   frontend_bucket  = "${local.name}-frontend-${random_id.suffix.hex}"
   frontend_origin  = "https://${aws_cloudfront_distribution.frontend.domain_name}"
-  browser_origins  = distinct(concat(var.allowed_origins, [local.frontend_origin]))
+  browser_origins = distinct(concat(var.allowed_origins, [
+    local.frontend_origin,
+    "https://${var.domain_name}",
+    "https://www.${var.domain_name}",
+  ]))
 }
 
 resource "aws_s3_bucket" "source" {
