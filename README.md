@@ -1,4 +1,4 @@
-# Serverless Image Upload & Processing
+# Serverless Image Processing Application
 
 A portfolio project demonstrating an event-driven AWS image pipeline. A browser requests a short-lived upload URL, uploads an image directly to private object storage, and an S3 event invokes Lambda to create an optimized thumbnail in a separate bucket.
 
