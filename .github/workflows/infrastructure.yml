@@ -55,11 +55,50 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
+
+      - name: Show selected AWS role
+        run: echo "role=${{ vars.AWS_DEPLOY_ROLE_ARN }}"
+
+      - name: Show GitHub OIDC claims
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import urllib.request
+
+          request_url = (
+              os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+              + "&audience=sts.amazonaws.com"
+          )
+
+          request = urllib.request.Request(
+              request_url,
+              headers={
+                  "Authorization":
+                      "Bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"]
+              },
+          )
+
+          with urllib.request.urlopen(request) as response:
+              token = json.load(response)["value"]
+
+          payload = token.split(".")[1]
+          payload += "=" * (-len(payload) % 4)
+          claims = json.loads(base64.urlsafe_b64decode(payload))
+
+          for key in ("aud", "sub", "repository", "repository_id",
+                      "environment", "ref", "job_workflow_ref"):
+              print(f"{key}={claims.get(key)}")
+          PY
+
       - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
           allowed-account-ids: "431655581157"
+          retry-max-attempts: 2
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.14.0"
