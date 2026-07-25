@@ -68,10 +68,28 @@ def handler(event, _context):
                 if error.response.get("ResponseMetadata", {}).get("HTTPStatusCode") == 404:
                     return response(202, {"status": "processing"})
                 raise
-            url = s3.generate_presigned_url(
+            image_url = s3.generate_presigned_url(
                 "get_object", Params={"Bucket": PROCESSED_BUCKET, "Key": processed_key}, ExpiresIn=300
             )
-            return response(200, {"status": "ready", "imageUrl": url, "expiresIn": 300})
+            download_url = s3.generate_presigned_url(
+                "get_object",
+                Params={
+                    "Bucket": PROCESSED_BUCKET,
+                    "Key": processed_key,
+                    "ResponseContentDisposition": f'attachment; filename="{key.rsplit(".", 1)[0]}.webp"',
+                    "ResponseContentType": "image/webp",
+                },
+                ExpiresIn=300,
+            )
+            return response(
+                200,
+                {
+                    "status": "ready",
+                    "imageUrl": image_url,
+                    "downloadUrl": download_url,
+                    "expiresIn": 300,
+                },
+            )
     except (json.JSONDecodeError, UnicodeDecodeError):
         return response(400, {"message": "Request body must be valid JSON"})
     except Exception:
@@ -79,4 +97,3 @@ def handler(event, _context):
         return response(500, {"message": "Internal server error"})
 
     return response(404, {"message": "Route not found"})
-

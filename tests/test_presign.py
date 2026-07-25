@@ -37,3 +37,28 @@ def test_rejects_unsupported_content_type(monkeypatch):
     }
     assert module.handler(event, None)["statusCode"] == 400
 
+
+def test_returns_display_and_download_urls_for_processed_image(monkeypatch):
+    module, client = load_handler(monkeypatch)
+    client.generate_presigned_url.side_effect = [
+        "https://signed.example/display",
+        "https://signed.example/download",
+    ]
+    key = "3a778b6e-08a7-49ee-b3a5-20a72411f7d0.jpg"
+    event = {
+        "routeKey": "GET /images/{key}",
+        "pathParameters": {"key": key},
+        "requestContext": {"http": {"method": "GET"}, "requestId": "req-2"},
+    }
+
+    result = module.handler(event, None)
+    body = json.loads(result["body"])
+
+    assert result["statusCode"] == 200
+    assert body["imageUrl"] == "https://signed.example/display"
+    assert body["downloadUrl"] == "https://signed.example/download"
+    download_params = client.generate_presigned_url.call_args_list[1].kwargs["Params"]
+    assert download_params["ResponseContentType"] == "image/webp"
+    assert download_params["ResponseContentDisposition"] == (
+        'attachment; filename="3a778b6e-08a7-49ee-b3a5-20a72411f7d0.webp"'
+    )

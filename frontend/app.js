@@ -5,6 +5,7 @@ const status = document.querySelector("#status");
 const result = document.querySelector("#result");
 const progress = document.querySelector("#progress");
 const bar = document.querySelector("#progressBar");
+const downloadButton = document.querySelector("#downloadButton");
 
 document.querySelector("#chooseButton").addEventListener("click", () => input.click());
 input.addEventListener("change", () => input.files[0] && upload(input.files[0]));
@@ -13,7 +14,7 @@ input.addEventListener("change", () => input.files[0] && upload(input.files[0]))
 drop.addEventListener("drop", e => e.dataTransfer.files[0] && upload(e.dataTransfer.files[0]));
 
 async function upload(file) {
-  result.hidden = true; progress.hidden = false; bar.style.width = "10%"; status.textContent = "Requesting secure upload…";
+  result.hidden = true; downloadButton.hidden = true; downloadButton.removeAttribute("href"); progress.hidden = false; bar.style.width = "10%"; status.textContent = "Requesting secure upload…";
   try {
     if (!endpoint.startsWith("http")) throw new Error("Set apiEndpoint in frontend/config.js first.");
     if (!['image/jpeg','image/png','image/webp'].includes(file.type) || file.size > 10 * 1024 * 1024) throw new Error("Choose a JPEG, PNG, or WebP under 10 MB.");
@@ -29,10 +30,9 @@ async function upload(file) {
       const check = await fetch(`${endpoint}/images/${encodeURIComponent(key)}`);
       const payload = await check.json();
       if (check.ok && payload.status === "ready") {
-        result.src = payload.imageUrl; result.hidden = false; bar.style.width = "100%"; status.textContent = "Processing complete"; return;
+        result.src = payload.imageUrl; result.hidden = false; downloadButton.href = payload.downloadUrl; downloadButton.hidden = false; bar.style.width = "100%"; status.textContent = "Processing complete"; return;
       }
     }
     throw new Error("Processing is taking longer than expected. Check again shortly.");
   } catch (error) { status.textContent = error.message; bar.style.width = "0"; }
 }
-
